@@ -1,3 +1,5 @@
+package model;
+
 public interface DataManager {
     void start() throws Exception;
 

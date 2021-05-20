@@ -1,3 +1,5 @@
+package model;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -27,7 +29,7 @@ public class PowerRecord implements Serializable {
 
     @Override
     public String toString() {
-        return "PowerRecord{" +
+        return "model.PowerRecord{" +
                 "power=" + power +
                 ", time=" + time +
                 '}';
