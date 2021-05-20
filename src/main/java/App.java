@@ -8,11 +8,13 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
+    private final DataManager dataManager = new DataManagerImpl();
+
     public static void main(String[] args) {
         Application.launch();
     }
 
-    public void start(Stage primaryStage) {
+    private void initStage(Stage primaryStage) {
         primaryStage.setTitle("PowerLogger");
         primaryStage.setWidth(300);
         primaryStage.setHeight(200);
@@ -26,7 +28,16 @@ public class App extends Application {
         primaryStage.setScene(primaryScene);
 
         primaryStage.show();
+    }
 
-        new PowerMeterReader(power -> System.out.println("Power = " + power + " W"));
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        initStage(primaryStage);
+        dataManager.start();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        dataManager.stop();
     }
 }
