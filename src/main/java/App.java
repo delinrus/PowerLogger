@@ -10,11 +10,19 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.fx.ChartViewer;
-import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
 
 
 public class App extends Application {
@@ -84,21 +92,31 @@ public class App extends Application {
 
     public static JFreeChart createChart() {
 
-        double[] values = {95, 49, 14, 59, 50, 66, 47, 40, 1, 67,
-                12, 58, 28, 63, 14, 9, 31, 17, 94, 71,
-                49, 64, 73, 97, 15, 63, 10, 12, 31, 62,
-                93, 49, 74, 90, 59, 14, 15, 88, 26, 57,
-                77, 44, 58, 91, 10, 67, 57, 19, 88, 84
-        };
 
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        TimeSeries series = new TimeSeries("Time");
+        series.add(new Second(new Date(LocalTime.of(1, 2, 10).toSecondOfDay() * 1000)), 10);
+        series.add(new Second(new Date(LocalTime.of(1, 4, 10).toSecondOfDay() * 1000)), 2);
+        series.add(new Second(new Date(LocalTime.of(1, 8, 10).toSecondOfDay() * 1000)), 59);
+        series.add(new Second(new Date(LocalTime.of(1, 13, 10).toSecondOfDay() * 1000)), 70);
+        series.add(new Second(new Date(LocalTime.of(1, 45, 10).toSecondOfDay() * 1000)), 75);
 
-        HistogramDataset dataset = new HistogramDataset();
-        dataset.addSeries("key", values, 20);
-
-        JFreeChart histogram = ChartFactory.createHistogram("JFreeChart Histogram",
+        dataset.addSeries(series);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart("JFreeChart Histogram",
                 "y values", "x values", dataset);
 
-        return histogram;
+        XYPlot plot = chart.getXYPlot();
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        DateAxis domainAxis = (DateAxis) plot.getDomainAxis();
+        rangeAxis.setAutoRange(false);
+        rangeAxis.setRange(0, 200);
+
+        domainAxis.setAutoRange(false);
+        domainAxis.setRange(new Date(LocalTime.of(0, 0, 0).toSecondOfDay() * 1000),
+                new Date(LocalTime.of(12, 0, 0).toSecondOfDay() * 1000));
+
+
+        return chart;
     }
 
     @Override
