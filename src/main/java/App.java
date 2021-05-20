@@ -13,16 +13,11 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.fx.ChartViewer;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.*;
 
 
 public class App extends Application {
@@ -90,16 +85,15 @@ public class App extends Application {
         return dayCellFactory;
     }
 
+
     public static JFreeChart createChart() {
-
-
         TimeSeriesCollection dataset = new TimeSeriesCollection();
         TimeSeries series = new TimeSeries("Time");
-        series.add(new Second(new Date(LocalTime.of(1, 2, 10).toSecondOfDay() * 1000)), 10);
-        series.add(new Second(new Date(LocalTime.of(1, 4, 10).toSecondOfDay() * 1000)), 2);
-        series.add(new Second(new Date(LocalTime.of(1, 8, 10).toSecondOfDay() * 1000)), 59);
-        series.add(new Second(new Date(LocalTime.of(1, 13, 10).toSecondOfDay() * 1000)), 70);
-        series.add(new Second(new Date(LocalTime.of(1, 45, 10).toSecondOfDay() * 1000)), 75);
+        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(7, 2, 10))), 10);
+        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 2, 10))), 20);
+        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 2, 10))), 30);
+        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 2, 10))), 20);
+        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 2, 10))), 25);
 
         dataset.addSeries(series);
         JFreeChart chart = ChartFactory.createTimeSeriesChart("JFreeChart Histogram",
@@ -109,11 +103,12 @@ public class App extends Application {
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         DateAxis domainAxis = (DateAxis) plot.getDomainAxis();
         rangeAxis.setAutoRange(false);
-        rangeAxis.setRange(0, 200);
+        rangeAxis.setRange(0, 100);
 
         domainAxis.setAutoRange(false);
-        domainAxis.setRange(new Date(LocalTime.of(0, 0, 0).toSecondOfDay() * 1000),
-                new Date(LocalTime.of(12, 0, 0).toSecondOfDay() * 1000));
+        domainAxis.setRange(
+                DateTimeUtils.convertToDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0))),
+                DateTimeUtils.convertToDate(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0, 0, 0))));
 
 
         return chart;
