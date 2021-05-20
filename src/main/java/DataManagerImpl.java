@@ -21,13 +21,16 @@ public class DataManagerImpl implements DataManager {
     @Override
     public void start() throws Exception {
         allRecords = readAllRecords();
+        System.out.println("Records count " + allRecords.size());
 
         recordWriter = new RecordWriter<>(recordFile);
+        recordWriter.write(allRecords);
+
         powerMeterReader = new PowerMeterReader(power -> {
             PowerRecord record = new PowerRecord(power, LocalDateTime.now());
             System.out.println("Power = " + record.toString() + " W");
             try {
-                recordWriter.writeLine(record);
+                recordWriter.write(record);
             } catch (IOException e) {
                 e.printStackTrace();
             }
