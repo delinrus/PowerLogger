@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.image.Image;
@@ -36,28 +37,30 @@ public class App extends Application {
         Image image = new Image(getClass().getResourceAsStream("/thunderbolt.png"));
         primaryStage.getIcons().add(image);
 
+        StackPane root = new StackPane();
+        root.setPadding(new Insets(10, 10, 10, 10));
+
         DatePicker datePicker = new DatePicker();
         datePicker.setValue(LocalDate.now());
         datePicker.setShowWeekNumbers(true);
         datePicker.setDayCellFactory(getDayCellFactory());
-
+        root.getChildren().add(datePicker);
+        StackPane.setAlignment(datePicker, Pos.TOP_LEFT);
         datePicker.valueProperty().addListener((ov, oldValue, newValue) -> {
             System.out.println(newValue);
         });
 
-        StackPane root = new StackPane();
-        root.setPadding(new Insets(10, 10, 10, 10));
-        root.getChildren().add(datePicker);
+        Button scaleChartBtn = new Button("Scale");
+        root.getChildren().add(scaleChartBtn);
+        StackPane.setAlignment(scaleChartBtn, Pos.TOP_RIGHT);
+        scaleChartBtn.setOnAction((e)-> System.out.println("Btn click"));
 
         ChartViewer viewer = new ChartViewer(createChart());
         root.getChildren().add(viewer);
         StackPane.setMargin(viewer, new Insets(40, 0, 0, 0));
-        StackPane.setAlignment(datePicker, Pos.TOP_LEFT);
-
 
         Scene primaryScene = new Scene(root);
         primaryStage.setScene(primaryScene);
-
         primaryStage.show();
     }
 
