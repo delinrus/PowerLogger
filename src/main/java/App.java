@@ -19,6 +19,7 @@ import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import presenter.Presenter;
 import utils.DateTimeUtils;
 import view.View;
 import view.ViewImpl;
@@ -30,7 +31,8 @@ import java.util.List;
 public class App extends Application {
 
     private final DataManager dataManager = new DataManagerImpl();
-    private final View view = new ViewImpl();
+    private final ViewImpl view = new ViewImpl();
+    private final Presenter presenter = new Presenter(view);
 
     public static void main(String[] args) {
         Application.launch();
@@ -38,6 +40,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        view.setPresenter(presenter);
         view.initStage(primaryStage);
         dataManager.start();
 
