@@ -11,4 +11,5 @@ public interface View {
     void setAvailableDates(List<LocalDate> dates);
     void scaleChart(LocalDate date);
     void setChartData(List<PowerRecord> records);
+    void setCurrentPower(double power);
 }

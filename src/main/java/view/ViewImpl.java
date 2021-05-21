@@ -1,11 +1,13 @@
 package view;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -16,12 +18,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.fx.ChartViewer;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.general.DatasetGroup;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.xy.XYDataset;
 import presenter.Presenter;
 import utils.DateTimeUtils;
 
@@ -34,6 +33,8 @@ public class ViewImpl implements View {
     private Presenter presenter;
     private DatePicker datePicker;
     private JFreeChart chart;
+    private Button refreshBtn;
+    private Label currentPowerLbl;
 
     @Override
     public void initStage(Stage primaryStage) {
@@ -53,14 +54,16 @@ public class ViewImpl implements View {
         datePicker.setDayCellFactory(getDayCellFactory(List.of(LocalDate.now())));
         root.getChildren().add(datePicker);
         StackPane.setAlignment(datePicker, Pos.TOP_LEFT);
-        datePicker.valueProperty().addListener((ov, oldValue, newValue) -> {
-            System.out.println(newValue);
-        });
+        datePicker.valueProperty().addListener((ov, oldValue, newValue) -> presenter.onDatePicked(newValue));
 
-        Button scaleChartBtn = new Button("Scale");
-        root.getChildren().add(scaleChartBtn);
-        StackPane.setAlignment(scaleChartBtn, Pos.TOP_RIGHT);
-        scaleChartBtn.setOnAction((e) -> presenter.onScaleBtnClick());
+        refreshBtn = new Button("Refresh");
+        root.getChildren().add(refreshBtn);
+        StackPane.setAlignment(refreshBtn, Pos.TOP_RIGHT);
+        refreshBtn.setOnAction((e) -> presenter.onRefreshBtnClick());
+
+        currentPowerLbl = new Label("0 W");
+        root.getChildren().add(currentPowerLbl);
+        StackPane.setAlignment(currentPowerLbl, Pos.TOP_CENTER);
 
         ChartViewer viewer = new ChartViewer(createChart());
         scaleChart(LocalDate.now());
@@ -81,9 +84,8 @@ public class ViewImpl implements View {
     public void scaleChart(LocalDate date) {
         XYPlot plot = chart.getXYPlot();
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAutoRange(true);
         DateAxis domainAxis = (DateAxis) plot.getDomainAxis();
-        rangeAxis.setAutoRange(false);
-        rangeAxis.setRange(0, 100);
         domainAxis.setAutoRange(false);
         domainAxis.setRange(
                 DateTimeUtils.convertToDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0))),
@@ -112,16 +114,8 @@ public class ViewImpl implements View {
 
     public JFreeChart createChart() {
         TimeSeriesCollection dataset = new TimeSeriesCollection();
-        TimeSeries series = new TimeSeries("Time");
-        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(7, 2, 10))), 10);
-        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 2, 10))), 20);
-        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 2, 10))), 30);
-        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 2, 10))), 20);
-        series.add(DateTimeUtils.convertToSecond(LocalDateTime.of(LocalDate.now(), LocalTime.of(11, 2, 10))), 25);
-
-        dataset.addSeries(series);
-        chart = ChartFactory.createTimeSeriesChart("JFreeChart Histogram",
-                "y values", "x values", dataset);
+        chart = ChartFactory.createTimeSeriesChart("Power diagram",
+                null, "P, W", dataset);
         return chart;
     }
 
@@ -135,7 +129,12 @@ public class ViewImpl implements View {
         TimeSeriesCollection dataset = (TimeSeriesCollection) plot.getDataset();
         dataset.removeAllSeries();
         TimeSeries series = new TimeSeries("Time");
-        records.forEach((pr)-> series.add(DateTimeUtils.convertToSecond(pr.time), pr.power));
+        records.forEach((pr) -> series.add(DateTimeUtils.convertToSecond(pr.time), pr.power));
         dataset.addSeries(series);
+    }
+
+    @Override
+    public void setCurrentPower(double power) {
+        Platform.runLater(() -> currentPowerLbl.setText(Double.toString(power) + " W"));
     }
 }

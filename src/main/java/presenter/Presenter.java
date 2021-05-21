@@ -1,37 +1,47 @@
 package presenter;
 
-import model.PowerRecord;
-import utils.DateTimeUtils;
+import model.DataManager;
 import view.View;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Presenter {
+public class Presenter implements Observer {
     private View view;
-    //private Model model;
+    private DataManager dataManager;
+    private LocalDate date = LocalDate.now();
 
-    public Presenter(View view) {
+    public Presenter(View view, DataManager dataManager) {
         this.view = view;
+        this.dataManager = dataManager;
+        dataManager.subscribe(this);
     }
 
-    public void onScaleBtnClick() {
-        view.scaleChart(LocalDate.now());
-        List<PowerRecord> list = new ArrayList<>();
-        list.add(new PowerRecord(10, LocalDateTime.of(LocalDate.now(), LocalTime.of(1, 2, 10))));
-        list.add(new PowerRecord(59, LocalDateTime.of(LocalDate.now(), LocalTime.of(2, 2, 10))));
-        list.add(new PowerRecord(80, LocalDateTime.of(LocalDate.now(), LocalTime.of(3, 2, 10))));
-        list.add(new PowerRecord(75, LocalDateTime.of(LocalDate.now(), LocalTime.of(4, 2, 10))));
-        list.add(new PowerRecord(60, LocalDateTime.of(LocalDate.now(), LocalTime.of(5, 2, 10))));
-        view.setChartData(list);
+    public void onRefreshBtnClick() {
+        refresh();
     }
 
     public void onDatePicked(LocalDate localDate) {
-
+        view.setChartData(dataManager.getRecords(localDate));
+        this.date = localDate;
     }
 
+    public void start() throws Exception {
+        dataManager.start();
+        refresh();
+    }
 
+    public void stop() throws Exception {
+        dataManager.stop();
+    }
+
+    private void refresh() {
+        view.setAvailableDates(dataManager.getAvailableDates());
+        view.setChartData(dataManager.getRecords(date));
+        view.scaleChart(date);
+    }
+
+    @Override
+    public void updateValue(double value) {
+        view.setCurrentPower(value);
+    }
 }
