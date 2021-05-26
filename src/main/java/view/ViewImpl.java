@@ -88,8 +88,8 @@ public class ViewImpl implements View {
         DateAxis domainAxis = (DateAxis) plot.getDomainAxis();
         domainAxis.setAutoRange(false);
         domainAxis.setRange(
-                DateTimeUtils.convertToDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0, 0))),
-                DateTimeUtils.convertToDate(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0, 0, 0))));
+                DateTimeUtils.convertToDate(LocalDateTime.of(date, LocalTime.of(0, 0, 0))),
+                DateTimeUtils.convertToDate(LocalDateTime.of(date.plusDays(1), LocalTime.of(0, 0, 0))));
     }
 
     private Callback<DatePicker, DateCell> getDayCellFactory(List<LocalDate> dates) {
