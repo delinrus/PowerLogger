@@ -5,8 +5,7 @@ import presenter.Presenter;
 import view.ViewImpl;
 
 
-public class App extends Application {
-
+public class App extends Application { 
     private final DataManager dataManager = new DataManager();
     private final ViewImpl view = new ViewImpl();
     private final Presenter presenter = new Presenter(view, dataManager);

@@ -19,6 +19,7 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.fx.ChartViewer;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import presenter.Presenter;
@@ -129,7 +130,17 @@ public class ViewImpl implements View {
         TimeSeriesCollection dataset = (TimeSeriesCollection) plot.getDataset();
         dataset.removeAllSeries();
         TimeSeries series = new TimeSeries("Time");
-        records.forEach((pr) -> series.add(DateTimeUtils.convertToSecond(pr.time), pr.power));
+ 
+        Second lastTime = new Second();
+        // Adding to series only unique times
+        for(PowerRecord pr: records) {
+            Second newTime = DateTimeUtils.convertToSecond(pr.time);
+            if (!lastTime.equals(newTime)) {
+                series.add(newTime, pr.power);
+            }
+            lastTime = newTime;
+        }
+
         dataset.addSeries(series);
     }
 

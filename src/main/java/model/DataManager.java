@@ -6,15 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class DataManager {
     private final File recordFile = new File("records.svr");
     private PowerMeterReader powerMeterReader;
     private RecordWriter<PowerRecord> recordWriter;
-    private List<PowerRecord> allRecords = new ArrayList<>();
+    private final List<PowerRecord> allRecords = new CopyOnWriteArrayList<>();
     private Observer observer;
 
 
@@ -26,12 +26,11 @@ public class DataManager {
     }
 
     public void start() throws Exception {
-        allRecords = readAllRecords();
+        allRecords.addAll(readAllRecords());
         System.out.println("Records count " + allRecords.size());
 
         recordWriter = new RecordWriter<>(recordFile);
         recordWriter.write(allRecords);
-
         powerMeterReader = new PowerMeterReader(power -> {
             PowerRecord record = new PowerRecord(power, LocalDateTime.now());
             allRecords.add(record);
