@@ -136,7 +136,7 @@ public class ViewImpl implements View {
         for(PowerRecord pr: records) {
             Second newTime = DateTimeUtils.convertToSecond(pr.time);
             if (!lastTime.equals(newTime)) {
-                series.add(newTime, pr.power);
+                series.addOrUpdate(newTime, pr.power);
             }
             lastTime = newTime;
         }
