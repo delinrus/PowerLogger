@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class DataManager {
     private final File recordFile = new File("records.svr");
-    private PowerMeterReader powerMeterReader;
+    private PowerMeterSocketReader powerMeterReader;
     private RecordWriter<PowerRecord> recordWriter;
     private final List<PowerRecord> allRecords = new CopyOnWriteArrayList<>();
     private Observer observer;
@@ -31,7 +31,7 @@ public class DataManager {
 
         recordWriter = new RecordWriter<>(recordFile);
         recordWriter.write(allRecords);
-        powerMeterReader = new PowerMeterReader(power -> {
+        powerMeterReader = new PowerMeterSocketReader(power -> {
             PowerRecord record = new PowerRecord(power, LocalDateTime.now());
             allRecords.add(record);
             if (observer != null) {
