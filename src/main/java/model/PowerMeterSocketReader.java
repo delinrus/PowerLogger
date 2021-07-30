@@ -49,8 +49,7 @@ public class PowerMeterSocketReader implements AutoCloseable {
                 try {
                     String data = in.readLine();
                     callback.accept(Double.valueOf(data));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception ignored) {
                 }
             }
         });
