@@ -39,16 +39,21 @@ public class PowerMeterSocketReader implements AutoCloseable {
     }
 
     private void sendQuery() {
-        try {
-            out.println("V02\r\n");
-            String data = in.readLine();
-            callback.accept(Double.valueOf(data));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        out.println("V02\r\n");
     }
 
     private void startCommunication() {
         executorService.scheduleAtFixedRate(this::sendQuery, 0, 5, TimeUnit.SECONDS);
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    String data = in.readLine();
+                    callback.accept(Double.valueOf(data));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
     }
 }
